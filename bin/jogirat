@@ -1,0 +1,190 @@
+#!/bin/bash
+
+set -euo pipefail
+
+source "$(dirname "${BASH_SOURCE[0]}")/runtime-config.sh"
+
+MODEL="$LT_WHISPER_MODEL"
+WHISPER="$LT_WHISPER"
+
+usage() {
+  echo "Usage:"
+  echo "  jogirat <audio-file>"
+  echo "  jogirat --srt <audio-file>"
+  echo "  jogirat --json <audio-file>"
+  echo "  jogirat --all <audio-file>"
+  echo
+  echo "Outputs:"
+  echo "  default : TXT"
+  echo "  --srt           : TXT + SRT"
+  echo "  --json          : TXT + JSON"
+  echo "  --all           : TXT + SRT + JSON"
+}
+
+MODE="txt"
+
+if [ "$#" -eq 1 ]; then
+  INPUT="$1"
+elif [ "$#" -eq 2 ]; then
+  case "$1" in
+    --srt)
+      MODE="srt"
+      ;;
+    --json)
+      MODE="json"
+      ;;
+    --all)
+      MODE="all"
+      ;;
+    *)
+      usage
+      exit 1
+      ;;
+  esac
+
+  INPUT="$2"
+else
+  usage
+  exit 1
+fi
+
+if [ ! -f "$INPUT" ]; then
+  echo "Error: file not found:"
+  echo "  $INPUT"
+  exit 1
+fi
+
+INPUT_DIR="$(cd "$(dirname "$INPUT")" && pwd)"
+INPUT_NAME="$(basename "$INPUT")"
+BASE="${INPUT_NAME%.*}"
+
+OUTPUT_TXT="$INPUT_DIR/$BASE.txt"
+OUTPUT_SRT="$INPUT_DIR/$BASE.srt"
+OUTPUT_JSON="$INPUT_DIR/$BASE.json"
+
+TMP_DIR="$(mktemp -d -t legaltranscriber)"
+TMP_WAV="$TMP_DIR/input.wav"
+
+cleanup() {
+  rm -rf "$TMP_DIR"
+}
+
+trap cleanup EXIT
+
+echo "Preparing: $INPUT_NAME"
+
+"$LT_FFMPEG" \
+  -hide_banner \
+  -loglevel error \
+  -y \
+  -i "$INPUT" \
+  -ac 1 \
+  -ar 16000 \
+  "$TMP_WAV"
+
+echo "Transcribing with the large-v3 model..."
+echo
+
+export HF_HUB_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
+export TOKENIZERS_PARALLELISM=false
+
+case "$MODE" in
+
+  txt)
+    "$WHISPER" \
+      "$TMP_WAV" \
+      --model "$MODEL" \
+      --language hu \
+      --output-format txt \
+      --condition-on-previous-text False \
+      --output-dir "$TMP_DIR" \
+      --word-timestamps True \
+      --hallucination-silence-threshold 2 \
+      --verbose False
+    ;;
+
+  srt)
+    "$WHISPER" \
+      "$TMP_WAV" \
+      --model "$MODEL" \
+      --language hu \
+      --output-format all \
+      --verbose False \
+      --word-timestamps True \
+      --hallucination-silence-threshold 2 \
+      --condition-on-previous-text False \
+      --output-dir "$TMP_DIR"
+    ;;
+
+  json)
+    "$WHISPER" \
+      "$TMP_WAV" \
+      --model "$MODEL" \
+      --language hu \
+      --verbose False \
+      --output-format all \
+      --condition-on-previous-text False \
+      --word-timestamps True \
+      --hallucination-silence-threshold 2 \
+      --output-dir "$TMP_DIR"
+    ;;
+
+  all)
+    "$WHISPER" \
+      "$TMP_WAV" \
+      --model "$MODEL" \
+      --language hu \
+      --verbose False \
+      --output-format all \
+      --condition-on-previous-text False \
+      --word-timestamps True \
+      --hallucination-silence-threshold 2 \
+      --output-dir "$TMP_DIR"
+    ;;
+
+esac
+
+
+# Validate every requested output before replacing any existing results.
+REQUIRED_FORMATS=(txt)
+case "$MODE" in
+  srt) REQUIRED_FORMATS+=(srt) ;;
+  json) REQUIRED_FORMATS+=(json) ;;
+  all) REQUIRED_FORMATS+=(srt json) ;;
+esac
+
+for FORMAT in "${REQUIRED_FORMATS[@]}"; do
+  if [ ! -f "$TMP_DIR/input.$FORMAT" ]; then
+    echo "Error: Whisper did not create the requested $FORMAT output." >&2
+    exit 1
+  fi
+done
+
+mv "$TMP_DIR/input.txt" "$OUTPUT_TXT"
+if [ "$MODE" = "srt" ] || [ "$MODE" = "all" ]; then
+  mv "$TMP_DIR/input.srt" "$OUTPUT_SRT"
+fi
+if [ "$MODE" = "json" ] || [ "$MODE" = "all" ]; then
+  mv "$TMP_DIR/input.json" "$OUTPUT_JSON"
+fi
+
+
+echo
+echo "Done:"
+
+if [ -f "$OUTPUT_TXT" ]; then
+  echo "  $OUTPUT_TXT"
+fi
+
+if [ "$MODE" = "srt" ] || [ "$MODE" = "all" ]; then
+  if [ -f "$OUTPUT_SRT" ]; then
+    echo "  $OUTPUT_SRT"
+  fi
+fi
+
+if [ "$MODE" = "json" ] || [ "$MODE" = "all" ]; then
+  if [ -f "$OUTPUT_JSON" ]; then
+    echo "  $OUTPUT_JSON"
+  fi
+fi

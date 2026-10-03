@@ -1,0 +1,4 @@
+# Direct runtime dependencies; requirements.txt pins the full closure.
+mlx-whisper==0.4.3
+pyannote-audio==4.0.7
+huggingface-hub==1.33.0

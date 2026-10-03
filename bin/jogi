@@ -1,0 +1,167 @@
+#!/bin/bash
+
+set -euo pipefail
+
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+JOGIRAT="$BIN_DIR/jogirat"
+JOGISPEAKER="$BIN_DIR/jogispeaker"
+JOGIJAVIT="$BIN_DIR/jogijavit"
+
+usage() {
+    echo "Usage:"
+    echo "  jogi <audio-file>"
+    echo
+    echo "Example:"
+    echo '  jogi ~/Desktop/targyalas.m4a'
+}
+
+if [ "$#" -ne 1 ]; then
+    usage
+    exit 1
+fi
+
+INPUT="$1"
+
+if [ ! -f "$INPUT" ]; then
+    echo "Error: input file not found:"
+    echo "  $INPUT"
+    exit 1
+fi
+
+for CMD in "$JOGIRAT" "$JOGISPEAKER" "$JOGIJAVIT"; do
+    if [ ! -x "$CMD" ]; then
+        echo "Error: component is not executable:"
+        echo "  $CMD"
+        exit 1
+    fi
+done
+
+INPUT_DIR="$(cd "$(dirname "$INPUT")" && pwd)"
+INPUT_NAME="$(basename "$INPUT")"
+INPUT="$INPUT_DIR/$INPUT_NAME"
+
+BASE="${INPUT_NAME%.*}"
+
+TXT="$INPUT_DIR/$BASE.txt"
+SRT="$INPUT_DIR/$BASE.srt"
+JSON="$INPUT_DIR/$BASE.json"
+
+SPEAKERS="$INPUT_DIR/$BASE.speakers.txt"
+CORRECTED="$INPUT_DIR/$BASE.speakers.jav.txt"
+DIFF="$INPUT_DIR/$BASE.speakers.diff.txt"
+SUSPECT="$INPUT_DIR/$BASE.speakers.gyanus.txt"
+
+echo
+echo "========================================"
+echo " Processing legal audio"
+echo "========================================"
+echo
+echo "Input:"
+echo "  $INPUT"
+echo
+
+#
+# 1. WHISPER
+#
+
+echo "[1/3] Hungarian transcription"
+echo "      Whisper large-v3"
+echo
+
+"$JOGIRAT" --all "$INPUT"
+
+if [ ! -f "$TXT" ] || [ ! -f "$JSON" ]; then
+    echo
+    echo "Error: Whisper output is incomplete."
+    exit 1
+fi
+
+echo
+echo "[1/3] Done."
+echo
+
+#
+# 2. SPEAKER DIARIZATION
+#
+
+echo "[2/3] Speaker diarization"
+echo
+
+"$JOGISPEAKER" "$INPUT"
+
+if [ ! -f "$SPEAKERS" ]; then
+    echo
+    echo "Error: speaker transcript was not created."
+    exit 1
+fi
+
+echo
+echo "[2/3] Done."
+echo
+
+#
+# 3. TEXT CORRECTION
+#
+
+echo "[3/3] Correcting spelling and ASR errors"
+echo
+
+"$JOGIJAVIT" "$SPEAKERS"
+
+if [ ! -f "$CORRECTED" ]; then
+    echo
+    echo "Error: corrected file was not created."
+    exit 1
+fi
+
+echo
+echo "[3/3] Done."
+echo
+
+#
+# SUMMARY
+#
+
+echo "========================================"
+echo " Processing complete"
+echo "========================================"
+echo
+
+echo "Main output:"
+echo "  $CORRECTED"
+echo
+
+echo "Additional files:"
+echo "  Raw transcript:"
+echo "    $TXT"
+
+echo
+echo "  Speaker-labeled transcript:"
+echo "    $SPEAKERS"
+
+if [ -f "$SRT" ]; then
+    echo
+    echo "  SRT:"
+    echo "    $SRT"
+fi
+
+if [ -f "$JSON" ]; then
+    echo
+    echo "  Whisper JSON:"
+    echo "    $JSON"
+fi
+
+if [ -f "$DIFF" ]; then
+    echo
+    echo "  Automatic corrections diff:"
+    echo "    $DIFF"
+fi
+
+if [ -f "$SUSPECT" ]; then
+    echo
+    echo "  Uncertain words requiring review:"
+    echo "    $SUSPECT"
+fi
+
+echo
+echo "Done."

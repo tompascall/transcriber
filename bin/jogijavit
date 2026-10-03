@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -euo pipefail
+
+source "$(dirname "${BASH_SOURCE[0]}")/runtime-config.sh"
+
+PYTHON="$LT_PYTHON"
+SCRIPT="$REPO_DIR/app/text_correct.py"
+
+"$PYTHON" "$SCRIPT" "$@"
