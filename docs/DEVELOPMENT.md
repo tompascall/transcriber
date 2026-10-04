@@ -77,7 +77,10 @@ The coordinator runs Whisper transcription, speaker diarization, then conservati
 text correction. FFmpeg normalizes audio to 16 kHz mono WAV. Whisper writes TXT,
 SRT, and JSON. The merge script assigns each Whisper segment to the speaker with
 the greatest temporal overlap and merges consecutive same-speaker segments.
-It currently does not split speaker changes within a Whisper segment.
+Each speaker block is labeled with the first segment’s start time as
+`SPEAKER_00 [HH:MM:SS]:`, rounded down for seeking. Correction preserves the
+complete header and also supports older headers without timestamps. The merge
+still does not split speaker changes within a Whisper segment.
 
 Correction preserves speaker labels, applies custom replacements, and accepts a
 Hunspell suggestion only when there is exactly one. It writes a separate corrected

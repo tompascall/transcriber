@@ -12,6 +12,7 @@ from pyannote.audio.pipelines.utils.hook import ProgressHook
 
 
 from runtime_config import DIARIZATION_MODEL, FFMPEG
+from speaker_blocks import merge_blocks, render_blocks
 
 MODEL = DIARIZATION_MODEL
 
@@ -217,48 +218,8 @@ def main():
     # Merge consecutive segments from the same speaker
     #
 
-    blocks = []
-
-    for segment in assigned:
-
-        if (
-            blocks
-            and blocks[-1]["speaker"] == segment["speaker"]
-        ):
-            blocks[-1]["text"] += " " + segment["text"]
-            blocks[-1]["end"] = segment["end"]
-
-        else:
-            blocks.append(
-                {
-                    "speaker": segment["speaker"],
-                    "start": segment["start"],
-                    "end": segment["end"],
-                    "text": segment["text"],
-                }
-            )
-
-    #
-    # Output
-    #
-
-    with open(
-        output_path,
-        "w",
-        encoding="utf-8",
-    ) as f:
-
-        for block in blocks:
-
-            f.write(
-                f'{block["speaker"]}:\n'
-            )
-
-            f.write(
-                block["text"]
-            )
-
-            f.write("\n\n")
+    blocks = merge_blocks(assigned)
+    output_path.write_text(render_blocks(blocks), encoding="utf-8")
 
     print()
     print("Done:")

@@ -11,7 +11,9 @@ from pathlib import Path
 
 from runtime_config import CUSTOM_DICT, HUNSPELL, HUNSPELL_DICT
 
-SPEAKER_RE = re.compile(r"^\s*SPEAKER_[A-Za-z0-9_]+:\s*$")
+SPEAKER_RE = re.compile(
+    r"^\s*SPEAKER_[A-Za-z0-9_]+(?: \[\d{2,}:\d{2}:\d{2}\])?:\s*$"
+)
 
 # Words consisting of Unicode letters.
 # Keeps hyphenated and apostrophe-containing forms together.

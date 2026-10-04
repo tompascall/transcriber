@@ -90,12 +90,17 @@ Uses the local pyannote `speaker-diarization-community-1` model to identify when
 Output:
 
 ```text
-SPEAKER_00:
+SPEAKER_00 [00:00:12]:
 ...
 
-SPEAKER_01:
+SPEAKER_01 [00:01:35]:
 ...
 ```
+
+Each block includes its start position in the recording as `[HH:MM:SS]`, taken
+from the first Whisper JSON segment in that block. Seek to that time in your
+audio player. The corrected final transcript preserves these labels. Times are
+rounded down to whole seconds; speaker assignment remains at segment level.
 
 ### `jogijavit`
 
