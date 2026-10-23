@@ -98,7 +98,7 @@ def main():
         print(f"  {json_path}")
         print()
         print("First run, for example:")
-        print(f'  jogirat --all "{audio_path}"')
+        print(f'  transcribe --all "{audio_path}"')
         sys.exit(1)
 
     output_path = audio_path.with_suffix(".speakers.txt")
@@ -133,7 +133,7 @@ def main():
     print("Preparing audio for diarization...")
 
     with tempfile.TemporaryDirectory(
-        prefix="legaltranscriber-speaker-"
+        prefix="transcriber-speaker-"
     ) as tmp_dir:
 
         normalized_audio = Path(tmp_dir) / "input.wav"

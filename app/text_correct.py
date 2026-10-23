@@ -137,7 +137,7 @@ def hunspell_check(words):
 def main():
     if len(sys.argv) != 2:
         print("Usage:")
-        print("  jogijavit <text-file>")
+        print("  correct-transcript <text-file>")
         sys.exit(1)
 
     input_path = Path(sys.argv[1]).expanduser().resolve()
@@ -226,7 +226,7 @@ def main():
             return replacement
 
         # Multiple or no suggestions:
-        # avoid guessing in legal text.
+        # avoid guessing when a correction is uncertain.
         uncertain[word] += 1
 
         return word

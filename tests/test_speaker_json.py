@@ -26,8 +26,8 @@ class SpeakerJsonTest(unittest.TestCase):
             original = source.read_bytes()
             self.assertEqual(load_blocks(source), blocks)
             self.assertIn("Első", source.read_text())
-            result = subprocess.run([str(ROOT / "bin/jogirender"), str(source)],
-                                    env=dict(os.environ, LT_PYTHON=sys.executable),
+            result = subprocess.run([str(ROOT / "bin/render-transcript"), str(source)],
+                                    env=dict(os.environ, TRANSCRIBER_PYTHON=sys.executable),
                                     capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(source.with_suffix(".txt").read_text(), render_blocks(blocks))
@@ -35,8 +35,8 @@ class SpeakerJsonTest(unittest.TestCase):
             self.assertEqual(load_blocks(source)[0]["start"], 12.375)
             self.assertEqual(load_blocks(source)[0]["end"], 17.625)
             output = Path(temp) / "separate.txt"
-            subprocess.run([str(ROOT / "bin/jogirender"), str(source), "--output", str(output)],
-                           env=dict(os.environ, LT_PYTHON=sys.executable), check=True,
+            subprocess.run([str(ROOT / "bin/render-transcript"), str(source), "--output", str(output)],
+                           env=dict(os.environ, TRANSCRIBER_PYTHON=sys.executable), check=True,
                            capture_output=True)
             self.assertEqual(output.read_text(), render_blocks(blocks))
 

@@ -1,6 +1,6 @@
-# LegalTranscriber
+# Transcriber
 
-An offline transcription system for Hungarian legal audio on macOS.
+An offline transcription system for Hungarian audio on macOS.
 
 The goal is to process 1–2 hours of Hungarian audio locally, without cloud services, and produce:
 
@@ -16,13 +16,13 @@ The goal is to process 1–2 hours of Hungarian audio locally, without cloud ser
 Run the complete pipeline with a single command:
 
 ```bash
-./bin/jogi /path/to/targyalas.m4a
+./bin/transcriber /path/to/targyalas.m4a
 ```
 
 Example:
 
 ```bash
-./bin/jogi ~/Desktop/targyalas.m4a
+./bin/transcriber ~/Desktop/targyalas.m4a
 ```
 
 Supported input formats include `.m4a`, `.mp3`, and `.wav`.
@@ -67,24 +67,24 @@ Corrected TXT + diff + uncertain words
 
 ## Main components
 
-### `jogi`
+### `transcriber`
 
 The main entry point. Runs transcription, speaker diarization, and automatic text correction in sequence.
 
-### `jogirat`
+### `transcribe`
 
 Uses FFmpeg to temporarily convert the audio to a 16 kHz mono WAV file, then transcribes it with the local `whisper-large-v3-mlx` model.
 
 Usage:
 
 ```bash
-./bin/jogirat hanganyag.m4a
-./bin/jogirat --srt hanganyag.m4a
-./bin/jogirat --json hanganyag.m4a
-./bin/jogirat --all hanganyag.m4a
+./bin/transcribe hanganyag.m4a
+./bin/transcribe --srt hanganyag.m4a
+./bin/transcribe --json hanganyag.m4a
+./bin/transcribe --all hanganyag.m4a
 ```
 
-### `jogispeaker`
+### `diarize`
 
 Uses the local pyannote `speaker-diarization-community-1` model to identify when each speaker is speaking, then aligns that information with the timestamps in the Whisper JSON output.
 
@@ -103,7 +103,7 @@ from the first Whisper JSON segment in that block. Seek to that time in your
 audio player. The corrected final transcript preserves these labels. Times are
 rounded down to whole seconds; speaker assignment remains at segment level.
 
-### `jogijavit`
+### `correct-transcript`
 
 Performs conservative automatic error correction using a Hungarian Hunspell dictionary and a custom ASR correction dictionary.
 
@@ -136,7 +136,7 @@ Audio and transcripts are not uploaded to the cloud during processing.
 
 ## Note
 
-Speaker diarization and automatic correction are not completely accurate. For legal use, the final text should be reviewed by a person.
+Speaker diarization and automatic correction are not completely accurate. The final text should be reviewed by a person.
 
 The original Whisper transcript, the speaker-labeled version, the corrected version, and the diff are retained as separate files so that the processing can be audited.
 
@@ -150,7 +150,7 @@ The original Whisper transcript, the speaker-labeled version, the corrected vers
 Run the repository version from the project directory:
 
 ```bash
-./bin/jogi /path/to/audio.m4a
+./bin/transcriber /path/to/audio.m4a
 ```
 
 Run `./scripts/setup.sh` first to create the project-local `.venv/`, `models/`,
@@ -160,8 +160,8 @@ porting requirements, and future improvements. Downloaded assets and the Python
 environment are excluded from Git.
 
 The coordinator invokes its sibling commands, which run the repository's Python
-scripts and correction dictionary. Command names and the `.jav.txt` and
-`.gyanus.txt` suffixes retain their existing spelling for compatibility.
+scripts and correction dictionary. The `.jav.txt` and `.gyanus.txt` output
+suffixes retain their existing spelling for compatibility.
 Transcription and correction target Hungarian audio and text.
 
 ## Regenerate a final transcript without running models
@@ -171,8 +171,8 @@ start and end in seconds, and original uncorrected text. Fractional timestamps
 are preserved in JSON; TXT labels show whole seconds.
 
 ```bash
-./bin/jogirender /path/to/recording.speakers.json
-./bin/jogijavit /path/to/recording.speakers.txt
+./bin/render-transcript /path/to/recording.speakers.json
+./bin/correct-transcript /path/to/recording.speakers.txt
 ```
 
 This recreates the timestamped speaker TXT and corrected final
@@ -181,7 +181,7 @@ Existing TXT and correction outputs are replaced; manual text edits are not
 stored in the JSON. To preserve an edited transcript, render a separate copy:
 
 ```bash
-./bin/jogirender /path/to/recording.speakers.json --output /path/to/copy.speakers.txt
+./bin/render-transcript /path/to/recording.speakers.json --output /path/to/copy.speakers.txt
 ```
 
 Older recordings without `speakers.json` require a diarization run to create it,

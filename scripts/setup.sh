@@ -30,4 +30,4 @@ if [ "${1:-}" != "--skip-assets" ]; then
     # Setup downloads online; offline flags apply only when running transcription.
     env HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 "$ROOT/.venv/bin/python" "$ROOT/scripts/download_assets.py"
 fi
-echo "Setup complete. Run: $ROOT/bin/jogi /path/to/audio.m4a"
+echo "Setup complete. Run: $ROOT/bin/transcriber /path/to/audio.m4a"

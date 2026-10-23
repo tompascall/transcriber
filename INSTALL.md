@@ -54,7 +54,7 @@ setup always prepares the default directories inside this checkout.
 ## Run and verify
 
 ```bash
-./bin/jogi /path/to/recording.m4a
+./bin/transcriber /path/to/recording.m4a
 ```
 
 Expected outputs next to the recording:

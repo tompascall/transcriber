@@ -15,7 +15,7 @@ if [ -f "$REPO_DIR/.env" ]; then
         config_key="${config_line%%=*}"
         config_value="${config_line#*=}"
         case "$config_key" in
-            LT_RUNTIME_DIR|LT_PYTHON|LT_WHISPER|LT_WHISPER_MODEL|LT_DIARIZATION_MODEL|LT_HUNSPELL_DICT|LT_CUSTOM_DICT|LT_FFMPEG|LT_HUNSPELL) ;;
+            TRANSCRIBER_RUNTIME_DIR|TRANSCRIBER_PYTHON|TRANSCRIBER_WHISPER|TRANSCRIBER_WHISPER_MODEL|TRANSCRIBER_DIARIZATION_MODEL|TRANSCRIBER_HUNSPELL_DICT|TRANSCRIBER_CUSTOM_DICT|TRANSCRIBER_FFMPEG|TRANSCRIBER_HUNSPELL) ;;
             *) echo "Error: unknown .env setting: $config_key" >&2; exit 1 ;;
         esac
         if [[ "$config_value" == \"*\" && "$config_value" == *\" ]]; then
@@ -29,12 +29,12 @@ if [ -f "$REPO_DIR/.env" ]; then
     done < "$REPO_DIR/.env"
 fi
 
-export LT_RUNTIME_DIR="${LT_RUNTIME_DIR:-$REPO_DIR}"
-export LT_PYTHON="${LT_PYTHON:-$LT_RUNTIME_DIR/.venv/bin/python}"
-export LT_WHISPER="${LT_WHISPER:-$LT_RUNTIME_DIR/.venv/bin/mlx_whisper}"
-export LT_WHISPER_MODEL="${LT_WHISPER_MODEL:-$LT_RUNTIME_DIR/models/whisper-large-v3-mlx}"
-export LT_DIARIZATION_MODEL="${LT_DIARIZATION_MODEL:-$LT_RUNTIME_DIR/models/pyannote-speaker-diarization-community-1}"
-export LT_HUNSPELL_DICT="${LT_HUNSPELL_DICT:-$LT_RUNTIME_DIR/dictionaries/hu_HU}"
-export LT_CUSTOM_DICT="${LT_CUSTOM_DICT:-$REPO_DIR/config/custom_replacements.tsv}"
-export LT_FFMPEG="${LT_FFMPEG:-ffmpeg}"
-export LT_HUNSPELL="${LT_HUNSPELL:-hunspell}"
+export TRANSCRIBER_RUNTIME_DIR="${TRANSCRIBER_RUNTIME_DIR:-$REPO_DIR}"
+export TRANSCRIBER_PYTHON="${TRANSCRIBER_PYTHON:-$TRANSCRIBER_RUNTIME_DIR/.venv/bin/python}"
+export TRANSCRIBER_WHISPER="${TRANSCRIBER_WHISPER:-$TRANSCRIBER_RUNTIME_DIR/.venv/bin/mlx_whisper}"
+export TRANSCRIBER_WHISPER_MODEL="${TRANSCRIBER_WHISPER_MODEL:-$TRANSCRIBER_RUNTIME_DIR/models/whisper-large-v3-mlx}"
+export TRANSCRIBER_DIARIZATION_MODEL="${TRANSCRIBER_DIARIZATION_MODEL:-$TRANSCRIBER_RUNTIME_DIR/models/pyannote-speaker-diarization-community-1}"
+export TRANSCRIBER_HUNSPELL_DICT="${TRANSCRIBER_HUNSPELL_DICT:-$TRANSCRIBER_RUNTIME_DIR/dictionaries/hu_HU}"
+export TRANSCRIBER_CUSTOM_DICT="${TRANSCRIBER_CUSTOM_DICT:-$REPO_DIR/config/custom_replacements.tsv}"
+export TRANSCRIBER_FFMPEG="${TRANSCRIBER_FFMPEG:-ffmpeg}"
+export TRANSCRIBER_HUNSPELL="${TRANSCRIBER_HUNSPELL:-hunspell}"

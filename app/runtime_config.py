@@ -5,9 +5,9 @@ from pathlib import Path
 
 REPO_DIR = Path(__file__).resolve().parent.parent
 KEYS = {
-    "LT_RUNTIME_DIR", "LT_PYTHON", "LT_WHISPER", "LT_WHISPER_MODEL",
-    "LT_DIARIZATION_MODEL", "LT_HUNSPELL_DICT", "LT_CUSTOM_DICT",
-    "LT_FFMPEG", "LT_HUNSPELL",
+    "TRANSCRIBER_RUNTIME_DIR", "TRANSCRIBER_PYTHON", "TRANSCRIBER_WHISPER", "TRANSCRIBER_WHISPER_MODEL",
+    "TRANSCRIBER_DIARIZATION_MODEL", "TRANSCRIBER_HUNSPELL_DICT", "TRANSCRIBER_CUSTOM_DICT",
+    "TRANSCRIBER_FFMPEG", "TRANSCRIBER_HUNSPELL",
 }
 
 
@@ -27,11 +27,11 @@ def load_env():
 
 
 load_env()
-RUNTIME_DIR = os.environ.get("LT_RUNTIME_DIR") or str(REPO_DIR)
-DIARIZATION_MODEL = os.environ.get("LT_DIARIZATION_MODEL") or str(
+RUNTIME_DIR = os.environ.get("TRANSCRIBER_RUNTIME_DIR") or str(REPO_DIR)
+DIARIZATION_MODEL = os.environ.get("TRANSCRIBER_DIARIZATION_MODEL") or str(
     Path(RUNTIME_DIR) / "models/pyannote-speaker-diarization-community-1"
 )
-HUNSPELL_DICT = os.environ.get("LT_HUNSPELL_DICT") or str(Path(RUNTIME_DIR) / "dictionaries/hu_HU")
-CUSTOM_DICT = os.environ.get("LT_CUSTOM_DICT") or str(REPO_DIR / "config/custom_replacements.tsv")
-FFMPEG = os.environ.get("LT_FFMPEG") or "ffmpeg"
-HUNSPELL = os.environ.get("LT_HUNSPELL") or "hunspell"
+HUNSPELL_DICT = os.environ.get("TRANSCRIBER_HUNSPELL_DICT") or str(Path(RUNTIME_DIR) / "dictionaries/hu_HU")
+CUSTOM_DICT = os.environ.get("TRANSCRIBER_CUSTOM_DICT") or str(REPO_DIR / "config/custom_replacements.tsv")
+FFMPEG = os.environ.get("TRANSCRIBER_FFMPEG") or "ffmpeg"
+HUNSPELL = os.environ.get("TRANSCRIBER_HUNSPELL") or "hunspell"

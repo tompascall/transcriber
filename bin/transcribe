@@ -4,15 +4,15 @@ set -euo pipefail
 
 source "$(dirname "${BASH_SOURCE[0]}")/runtime-config.sh"
 
-MODEL="$LT_WHISPER_MODEL"
-WHISPER="$LT_WHISPER"
+MODEL="$TRANSCRIBER_WHISPER_MODEL"
+WHISPER="$TRANSCRIBER_WHISPER"
 
 usage() {
   echo "Usage:"
-  echo "  jogirat <audio-file>"
-  echo "  jogirat --srt <audio-file>"
-  echo "  jogirat --json <audio-file>"
-  echo "  jogirat --all <audio-file>"
+  echo "  transcribe <audio-file>"
+  echo "  transcribe --srt <audio-file>"
+  echo "  transcribe --json <audio-file>"
+  echo "  transcribe --all <audio-file>"
   echo
   echo "Outputs:"
   echo "  default : TXT"
@@ -62,7 +62,7 @@ OUTPUT_TXT="$INPUT_DIR/$BASE.txt"
 OUTPUT_SRT="$INPUT_DIR/$BASE.srt"
 OUTPUT_JSON="$INPUT_DIR/$BASE.json"
 
-TMP_DIR="$(mktemp -d -t legaltranscriber)"
+TMP_DIR="$(mktemp -d -t transcriber)"
 TMP_WAV="$TMP_DIR/input.wav"
 
 cleanup() {
@@ -73,7 +73,7 @@ trap cleanup EXIT
 
 echo "Preparing: $INPUT_NAME"
 
-"$LT_FFMPEG" \
+"$TRANSCRIBER_FFMPEG" \
   -hide_banner \
   -loglevel error \
   -y \

@@ -26,11 +26,11 @@ class TranscriptionOutputsTest(unittest.TestCase):
                 "        (out / ('input.' + ext)).write_text('new ' + ext)\n"
             )
             stub.chmod(0o755)
-            env = dict(os.environ, LT_FFMPEG=str(stub), LT_WHISPER=str(stub),
+            env = dict(os.environ, TRANSCRIBER_FFMPEG=str(stub), TRANSCRIBER_WHISPER=str(stub),
                        TEST_FORMATS=" ".join(generated))
             # The coordinator must stop before invoking diarization.
-            env["LT_PYTHON"] = str(directory / "missing-python")
-            args = [str(ROOT / "bin" / ("jogi" if coordinator else "jogirat"))]
+            env["TRANSCRIBER_PYTHON"] = str(directory / "missing-python")
+            args = [str(ROOT / "bin" / ("transcriber" if coordinator else "transcribe"))]
             if not coordinator and mode != "txt":
                 args.append("--" + mode)
             result = subprocess.run(args + [str(audio)], env=env, capture_output=True, text=True)

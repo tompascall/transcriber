@@ -40,7 +40,7 @@ class SpeakerTimestampsTest(unittest.TestCase):
             source = Path(temp) / "sample.speakers.txt"
             original = "SPEAKER_00 [01:02:03]:\njótárási\n\nSPEAKER_UNKNOWN:\njótárási\n"
             source.write_text(original)
-            with patch.object(sys, "argv", ["jogijavit", str(source)]), \
+            with patch.object(sys, "argv", ["correct-transcript", str(source)]), \
                  patch.object(text_correct, "load_custom_replacements", return_value={"jótárási": "jótállási"}), \
                  patch.object(text_correct, "hunspell_check", return_value={}) as spell, \
                  contextlib.redirect_stdout(io.StringIO()):

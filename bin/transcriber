@@ -3,16 +3,16 @@
 set -euo pipefail
 
 BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-JOGIRAT="$BIN_DIR/jogirat"
-JOGISPEAKER="$BIN_DIR/jogispeaker"
-JOGIJAVIT="$BIN_DIR/jogijavit"
+TRANSCRIBE="$BIN_DIR/transcribe"
+DIARIZE="$BIN_DIR/diarize"
+CORRECT_TRANSCRIPT="$BIN_DIR/correct-transcript"
 
 usage() {
     echo "Usage:"
-    echo "  jogi <audio-file>"
+    echo "  transcriber <audio-file>"
     echo
     echo "Example:"
-    echo '  jogi ~/Desktop/targyalas.m4a'
+    echo '  transcriber ~/Desktop/targyalas.m4a'
 }
 
 if [ "$#" -ne 1 ]; then
@@ -28,7 +28,7 @@ if [ ! -f "$INPUT" ]; then
     exit 1
 fi
 
-for CMD in "$JOGIRAT" "$JOGISPEAKER" "$JOGIJAVIT"; do
+for CMD in "$TRANSCRIBE" "$DIARIZE" "$CORRECT_TRANSCRIPT"; do
     if [ ! -x "$CMD" ]; then
         echo "Error: component is not executable:"
         echo "  $CMD"
@@ -54,7 +54,7 @@ SUSPECT="$INPUT_DIR/$BASE.speakers.gyanus.txt"
 
 echo
 echo "========================================"
-echo " Processing legal audio"
+echo " Processing audio"
 echo "========================================"
 echo
 echo "Input:"
@@ -69,7 +69,7 @@ echo "[1/3] Hungarian transcription"
 echo "      Whisper large-v3"
 echo
 
-"$JOGIRAT" --all "$INPUT"
+"$TRANSCRIBE" --all "$INPUT"
 
 if [ ! -f "$TXT" ] || [ ! -f "$JSON" ]; then
     echo
@@ -88,7 +88,7 @@ echo
 echo "[2/3] Speaker diarization"
 echo
 
-"$JOGISPEAKER" "$INPUT"
+"$DIARIZE" "$INPUT"
 
 if [ ! -f "$SPEAKERS" ] || [ ! -f "$SPEAKER_JSON" ]; then
     echo
@@ -107,7 +107,7 @@ echo
 echo "[3/3] Correcting spelling and ASR errors"
 echo
 
-"$JOGIJAVIT" "$SPEAKERS"
+"$CORRECT_TRANSCRIPT" "$SPEAKERS"
 
 if [ ! -f "$CORRECTED" ]; then
     echo

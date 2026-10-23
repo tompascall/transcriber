@@ -31,28 +31,28 @@ outside this lock.
 ## Runtime configuration
 
 Defaults resolve relative to the checkout, independently of the working directory.
-No external LegalTranscriber installation is required.
+The runtime is contained in this checkout.
 
 ```bash
 cp .env.example .env
 ```
 
 Copy the example only when creating or deliberately replacing configuration.
-`.env` is ignored by Git. Set `LT_RUNTIME_DIR` to a directory containing `.venv/`,
+`.env` is ignored by Git. Set `TRANSCRIBER_RUNTIME_DIR` to a directory containing `.venv/`,
 `models/`, and `dictionaries/`, or override individual paths. Environment variables
 take precedence over `.env`; empty values use defaults. Values are literal,
 optionally quoted: use absolute paths without `~`, shell variable expansion,
 `export`, or inline comments. The file is parsed as data, never executed.
 
-Available settings are listed in `.env.example`. `LT_FFMPEG` and `LT_HUNSPELL`
-accept executable paths or names resolved through `PATH`. `LT_HUNSPELL_DICT` is
-the dictionary prefix without `.aff` or `.dic`. `LT_CUSTOM_DICT` defaults to
+Available settings are listed in `.env.example`. `TRANSCRIBER_FFMPEG` and `TRANSCRIBER_HUNSPELL`
+accept executable paths or names resolved through `PATH`. `TRANSCRIBER_HUNSPELL_DICT` is
+the dictionary prefix without `.aff` or `.dic`. `TRANSCRIBER_CUSTOM_DICT` defaults to
 `config/custom_replacements.tsv` in the checkout.
 
 ## Running the checkout
 
 ```bash
-./bin/jogi /path/to/audio.m4a
+./bin/transcriber /path/to/audio.m4a
 ```
 
 The wrappers run the checkout's Python scripts using `.venv/`. Transcription uses
@@ -134,7 +134,7 @@ A Linux/NVIDIA port may replace `mlx-whisper` with `faster-whisper`, `whisper.cp
 4. Add a `--speakers N` option.
 5. Support batch processing.
 6. Add a GUI or drag-and-drop wrapper.
-7. Expand the legal terminology dictionary.
+7. Expand the custom terminology dictionary.
 8. Add a conservative local LLM as an optional second correction pass.
 9. Export HTML or DOCX.
 10. Link audio timestamps to the final transcript.
@@ -148,5 +148,5 @@ original recording, with fractional seconds preserved. Text is the original
 Whisper text, before correction. Consecutive same-speaker segments become one
 block with the first start and last end.
 
-`bin/jogirender` renders those saved blocks without loading models; `jogijavit`
+`bin/render-transcript` renders those saved blocks without loading models; `correct-transcript`
 then regenerates the corrected document while preserving timestamped headers.
