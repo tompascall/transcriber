@@ -64,6 +64,7 @@ recording.txt
 recording.srt
 recording.json
 recording.speakers.txt
+recording.speakers.json
 recording.speakers.jav.txt
 recording.speakers.diff.txt
 recording.speakers.gyanus.txt

@@ -138,3 +138,15 @@ A Linux/NVIDIA port may replace `mlx-whisper` with `faster-whisper`, `whisper.cp
 8. Add a conservative local LLM as an optional second correction pass.
 9. Export HTML or DOCX.
 10. Link audio timestamps to the final transcript.
+
+## Structured speaker output
+
+`speaker_merge.py` saves `recording.speakers.json` alongside the speaker TXT.
+Its schema is `{"version": 1, "time_unit": "seconds", "blocks": [...]}`.
+Each block has `speaker`, `start`, `end`, and `text`. Times are positions in the
+original recording, with fractional seconds preserved. Text is the original
+Whisper text, before correction. Consecutive same-speaker segments become one
+block with the first start and last end.
+
+`bin/jogirender` renders those saved blocks without loading models; `jogijavit`
+then regenerates the corrected document while preserving timestamped headers.

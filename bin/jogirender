@@ -1,0 +1,4 @@
+#!/bin/bash
+set -euo pipefail
+source "$(dirname "${BASH_SOURCE[0]}")/runtime-config.sh"
+"$LT_PYTHON" "$REPO_DIR/app/speaker_blocks.py" "$@"

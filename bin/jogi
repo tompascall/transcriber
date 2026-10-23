@@ -47,6 +47,7 @@ SRT="$INPUT_DIR/$BASE.srt"
 JSON="$INPUT_DIR/$BASE.json"
 
 SPEAKERS="$INPUT_DIR/$BASE.speakers.txt"
+SPEAKER_JSON="$INPUT_DIR/$BASE.speakers.json"
 CORRECTED="$INPUT_DIR/$BASE.speakers.jav.txt"
 DIFF="$INPUT_DIR/$BASE.speakers.diff.txt"
 SUSPECT="$INPUT_DIR/$BASE.speakers.gyanus.txt"
@@ -89,9 +90,9 @@ echo
 
 "$JOGISPEAKER" "$INPUT"
 
-if [ ! -f "$SPEAKERS" ]; then
+if [ ! -f "$SPEAKERS" ] || [ ! -f "$SPEAKER_JSON" ]; then
     echo
-    echo "Error: speaker transcript was not created."
+    echo "Error: speaker TXT or JSON was not created."
     exit 1
 fi
 
@@ -138,6 +139,9 @@ echo "    $TXT"
 echo
 echo "  Speaker-labeled transcript:"
 echo "    $SPEAKERS"
+echo
+echo "  Timed speaker blocks JSON:"
+echo "    $SPEAKER_JSON"
 
 if [ -f "$SRT" ]; then
     echo

@@ -12,7 +12,7 @@ from pyannote.audio.pipelines.utils.hook import ProgressHook
 
 
 from runtime_config import DIARIZATION_MODEL, FFMPEG
-from speaker_blocks import merge_blocks, render_blocks
+from speaker_blocks import merge_blocks, render_blocks, save_blocks
 
 MODEL = DIARIZATION_MODEL
 
@@ -219,11 +219,14 @@ def main():
     #
 
     blocks = merge_blocks(assigned)
+    blocks_path = audio_path.with_suffix(".speakers.json")
+    save_blocks(blocks_path, blocks)
     output_path.write_text(render_blocks(blocks), encoding="utf-8")
 
     print()
     print("Done:")
     print(f"  {output_path}")
+    print(f"  {blocks_path}")
 
 
 if __name__ == "__main__":

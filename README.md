@@ -40,6 +40,7 @@ targyalas.txt
 targyalas.srt
 targyalas.json
 targyalas.speakers.txt
+targyalas.speakers.json
 targyalas.speakers.diff.txt
 targyalas.speakers.gyanus.txt
 ```
@@ -162,3 +163,26 @@ The coordinator invokes its sibling commands, which run the repository's Python
 scripts and correction dictionary. Command names and the `.jav.txt` and
 `.gyanus.txt` suffixes retain their existing spelling for compatibility.
 Transcription and correction target Hungarian audio and text.
+
+## Regenerate a final transcript without running models
+
+Future runs also save `recording.speakers.json`, containing each block's speaker,
+start and end in seconds, and original uncorrected text. Fractional timestamps
+are preserved in JSON; TXT labels show whole seconds.
+
+```bash
+./bin/jogirender /path/to/recording.speakers.json
+./bin/jogijavit /path/to/recording.speakers.txt
+```
+
+This recreates the timestamped speaker TXT and corrected final
+`recording.speakers.jav.txt` without rerunning transcription or diarization.
+Existing TXT and correction outputs are replaced; manual text edits are not
+stored in the JSON. To preserve an edited transcript, render a separate copy:
+
+```bash
+./bin/jogirender /path/to/recording.speakers.json --output /path/to/copy.speakers.txt
+```
+
+Older recordings without `speakers.json` require a diarization run to create it,
+or a separate text-alignment step using their original Whisper JSON.
